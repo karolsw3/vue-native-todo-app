@@ -19,7 +19,7 @@
           :done="true">
         </todo-item>
         <touchable-opacity
-          :onPress="() => { doneList = []}"
+          :onPress="() => { doneList = [] }"
           :style="{ justifySelf: 'center', alignItems: 'center', marginVertical: 10 }">
           <text>Clear all</text>
         </touchable-opacity>
@@ -45,16 +45,26 @@
     </view>
     <touchable-opacity
       class="addItemButton"
-      :class="newTodoScreen ? 'rotated':''"
-      title="add" 
-      :onPress="()=>{ newTodoScreen = !newTodoScreen }">
-      <image :source="plusIcon" class="image-plus"></image>
+      title="add"
+      :style="{
+        shadowOffset: {height: 2, width: 0}
+      }"
+      :onPress="()=>{ newTodoScreen = !newTodoScreen; rotateButton() }">
+      <view>
+        <animated:view
+          :style="{
+            transform: [{rotate: rotateAnimation}]
+          }">
+          <image :source="plusIcon" class="image-plus"></image>
+        </animated:view>
+      </view>
     </touchable-opacity>
   </view>
 </template>
 <script>
 import TodoItem from './components/TodoItem'
 import plusIcon from './assets/add.png'
+import { Animated, Easing } from "react-native";
 
 export default {
   data: function () {
@@ -63,11 +73,20 @@ export default {
       todoList: [],
       doneList: [],
       newTodoScreen: false,
-      newTodoText: ''
+      newTodoText: '',
+      rotateAnimation: {},
+      buttonRotationDeg: 0
     }
   },
   components: {
     TodoItem
+  },
+  created () {
+    this.buttonRotationDeg = new Animated.Value(0)
+    this.rotateAnimation = this.buttonRotationDeg.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['0deg', '45deg']
+    })
   },
   methods: {
     markTodoAsDone (index) {
@@ -80,6 +99,14 @@ export default {
         this.newTodoText = ''
         this.newTodoScreen = false
       }
+    },
+    rotateButton () {
+      this.buttonRotationDeg.setValue(this.newTodoScreen ? 0:1)
+      Animated.timing(this.buttonRotationDeg, {
+        toValue: this.newTodoScreen ? 1:0,
+        duration: 120,
+        easing: Easing.linear
+      }).start()
     }
   }
 }
@@ -101,6 +128,9 @@ export default {
   width: 70px;
   height: 70px;
   background-color: #FF3352;
+  shadow-color: #ff3352;
+  shadow-opacity: 0.6;
+  shadow-radius: 6px;
   justify-content: center;
   align-items: center;
   padding: 10px;
@@ -152,10 +182,6 @@ export default {
 
 .dimmed {
   opacity: 0.12;
-}
-
-.rotated {
-  transform: rotate(45deg)
 }
 
 .todo-list {
