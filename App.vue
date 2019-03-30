@@ -1,30 +1,34 @@
 <template>
   <view class="container">
-    <scroll-view class="todo-list" :class="newTodoScreen ? 'dimmed':''">
-      <text class="text-header">Your TODO list</text>
-      <todo-item
-        v-for="(todo, index) in todoList"
-        :index="index"
-        :text="todo.text"
-        :onPress="markTodoAsDone"
-        :key="index"></todo-item>
-      <view v-if="doneList.length > 0">
-        <text class="text-header">Done</text>
+    <scroll-view class="todo-list">
+      <animated:view :style="{
+        opacity: dimmingAnimation
+      }">
+        <text class="text-header">Your TODO list</text>
         <todo-item
-          v-for="(todo, index) in doneList"
-          :text="todo.text"
+          v-for="(todo, index) in todoList"
           :index="index"
-          :onPress="()=>{}"
-          :key="index"
-          :done="true">
-        </todo-item>
-        <touchable-opacity
-          :onPress="() => { doneList = [] }"
-          :style="{ justifySelf: 'center', alignItems: 'center', marginVertical: 10 }">
-          <text>Clear all</text>
-        </touchable-opacity>
-        <view class="hollow-brick"></view>
-      </view>
+          :text="todo.text"
+          :onPress="markTodoAsDone"
+          :key="index"></todo-item>
+        <view v-if="doneList.length > 0">
+          <text class="text-header">Done</text>
+          <todo-item
+            v-for="(todo, index) in doneList"
+            :text="todo.text"
+            :index="index"
+            :onPress="()=>{}"
+            :key="index"
+            :done="true">
+          </todo-item>
+          <touchable-opacity
+            :onPress="() => { doneList = [] }"
+            :style="{ justifySelf: 'center', alignItems: 'center', marginVertical: 10 }">
+            <text>Clear all</text>
+          </touchable-opacity>
+          <view class="hollow-brick"></view>
+        </view>
+      </animated:view>
     </scroll-view>
     <view
       class="addItemContainer"
@@ -75,7 +79,9 @@ export default {
       newTodoScreen: false,
       newTodoText: '',
       rotateAnimation: {},
-      buttonRotationDeg: 0
+      dimmingAnimation: {},
+      buttonRotationDeg: 0,
+      todoListOpacity: 1
     }
   },
   components: {
@@ -83,9 +89,14 @@ export default {
   },
   created () {
     this.buttonRotationDeg = new Animated.Value(0)
+    this.todoListOpacity = new Animated.Value(1)
     this.rotateAnimation = this.buttonRotationDeg.interpolate({
       inputRange: [0, 1],
       outputRange: ['0deg', '45deg']
+    })
+    this.dimmingAnimation = this.todoListOpacity.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0.1, 1]
     })
   },
   methods: {
@@ -106,12 +117,21 @@ export default {
         duration: 120,
         easing: Easing.linear
       }).start()
+    },
+    dimTodoList () {
+      this.todoListOpacity.setValue(this.newTodoScreen ? 1:0)
+      Animated.timing(this.todoListOpacity, {
+        toValue: this.newTodoScreen ? 0:1,
+        duration: 90,
+        easing: Easing.linear
+      }).start()
     }
   },
   watch: {
     newTodoScreen () {
       this.newTodoText = ''
       this.rotateButton()
+      this.dimTodoList()
     }
   }
 }
@@ -183,10 +203,6 @@ export default {
 
 .hidden {
   display: none;
-}
-
-.dimmed {
-  opacity: 0.12;
 }
 
 .todo-list {
