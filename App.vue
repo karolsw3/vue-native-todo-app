@@ -26,8 +26,8 @@
             :style="{ justifySelf: 'center', alignItems: 'center', marginVertical: 10 }">
             <text>Clear all</text>
           </touchable-opacity>
-          <view class="hollow-brick"></view>
         </view>
+        <view class="empty-space"></view>
       </animated:view>
     </scroll-view>
     <view
@@ -218,7 +218,7 @@ export default {
   font-weight: 600;
 }
 
-.hollow-brick {
+.empty-space {
   width: 100%;
   height: 180px;
 }
