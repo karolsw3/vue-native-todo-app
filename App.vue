@@ -49,7 +49,7 @@
       :style="{
         shadowOffset: {height: 2, width: 0}
       }"
-      :onPress="()=>{ newTodoScreen = !newTodoScreen; rotateButton() }">
+      :onPress="()=>{ newTodoScreen = !newTodoScreen }">
       <view>
         <animated:view
           :style="{
@@ -96,7 +96,6 @@ export default {
     addTodo () {
       if (this.newTodoText !== '') {
         this.todoList.push({text: this.newTodoText})
-        this.newTodoText = ''
         this.newTodoScreen = false
       }
     },
@@ -107,6 +106,12 @@ export default {
         duration: 120,
         easing: Easing.linear
       }).start()
+    }
+  },
+  watch: {
+    newTodoScreen () {
+      this.newTodoText = ''
+      this.rotateButton()
     }
   }
 }
