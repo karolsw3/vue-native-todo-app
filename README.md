@@ -1,5 +1,5 @@
 # vue-native-todo-app
-A Todo app made in vue-native.
+A Todo app made in Vue Native.
 
 <div style="display: flex">
   <img src="https://github.com/karolsw3/vue-native-todo-app/blob/master/screenshots/1.png?raw=true" height="600">
